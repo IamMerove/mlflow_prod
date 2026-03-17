@@ -1,0 +1,69 @@
+# Python / venv / uv
+__pycache__/
+*.py[cod]
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+.env
+*.env
+pip-log.txt
+pip-delete-this-directory.txt
+uv.lock
+
+# MLflow
+mlruns/
+mlflow.db
+artifacts/
+models/
+
+# Docker
+*.log
+docker-compose.override.yml
+Dockerfile.*
+*.dockerignore
+
+# Éditeurs & OS
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# Données & gros fichiers
+data/*.csv
+data/*.parquet
+data/*.pkl
+*.h5
+*.joblib
+*.onnx
+*.pt
+*.pth
+*.bin
+
+# Cache & temporaires
+*.cache
+*.tmp
+tmp/
+temp/
+node_modules/
+
+# Jupyter / notebooks (si tu en ajoutes plus tard)
+.ipynb_checkpoints/
+*.ipynb_checkpoints/
+
+# Tests / coverage
+htmlcov/
+.coverage
+coverage.xml
+*.cover
+
+# Logs & sorties
+*.out
+*.err
+*.trace
