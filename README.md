@@ -28,17 +28,17 @@ Le projet repose sur une orchestration de 4 services isolés :
 
 Variable,Valeur par défaut,Description
 
-AWS_ACCESS_KEY_ID=minioadmin (Login de l'interface MinIO)
-AWS_SECRET_ACCESS_KEY=minioadmin (Password de l'interface MinIO)
-MLFLOW_S3_ENDPOINT_URL=http://localhost:9000 (Point d'entrée pour le stockage des modèles)
-MLFLOW_TRACKING_URI=http://localhost:5000 (Connexion au registre de modèles)
+AWS_ACCESS_KEY_ID=minioadmin
+AWS_SECRET_ACCESS_KEY=minioadmin 
+MLFLOW_S3_ENDPOINT_URL=http://localhost:9000 
+MLFLOW_TRACKING_URI=http://localhost:5000 
 
 
 ## Installation
 
 # 1. Cloner le projet
-git clone [URL_DU_DEPOT]
-cd iris-ml-factory
+git clone [https://github.com/IamMerove/mlflow_prod.git]
+
 
 # 2. Configurer les variables d'environnement
 cp .env.example .env
@@ -62,7 +62,7 @@ uv run --env-file .env src/train/train2.py
 L'API détecte le changement d'alias. Rafraîchissez l'interface Streamlit pour voir la V2 en action sans redémarrage.
 
 ### A. Tech Stack
-*(Dans cette tuile, sélectionne les logos ou liste-les simplement comme ceci)* :
+
 - **Backend :** Python 3.10+, FastAPI, Uvicorn.
 - **Frontend :** Streamlit.
 - **MLOps :** MLflow, MinIO (S3-compliant).
