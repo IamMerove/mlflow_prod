@@ -1,55 +1,104 @@
-ML Factory - Iris Prediction Service
 
-Cette "Usine ML" automatise le cycle de vie d'un modèle de Machine Learning, de l'entraînement au serving, avec une gestion de mise à jour à chaud (Hot-Reloading) sans interruption de service.
+# Titre : 🌸 Iris ML Factory
 
-🚀 Fonctionnalités
-Infrastructure MLOps : Orchestration Docker-Compose (MLflow, MinIO, FastAPI, Streamlit).
 
-Zéro-Downtime : L'API détecte dynamiquement le changement d'alias @prod dans MLflow.
+Description :
 
-Traçabilité : Chaque prédiction affiche la version exacte du modèle utilisé.
+Une infrastructure MLOps complète orchestrée par Docker, conçue pour l'entraînement, le versioning et le serving dynamique de modèles de Machine Learning. Ce projet démontre une architecture de Hot-Reloading permettant des mises à jour de modèles sans interruption de service.
 
-📂 Structure du projet
-Plaintext
-.
-├── src/
-│   ├── api/     # Service FastAPI (Serving)
-│   ├── front/   # Interface Streamlit
-│   └── train/   # Scripts d'entraînement (V1 & V2)
-├── docker-compose.yml
-├── .env.example   # Modèle de configuration
-└── README.md
-🛠️ Installation et Lancement
-1. Configuration des variables d'environnement
-C'est l'étape cruciale pour la liaison entre les services.
 
-Bash
+## Badges
+![Python](https://img.shields.io/badge/python-3.10+-blue?style=for-the-badge&logo=python&logoColor=white)
+![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)
+![MLflow](https://img.shields.io/badge/mlflow-%23d9ead3.svg?style=for-the-badge&logo=mlflow&logoColor=blue)
+
+
+## Deployment
+
+Le projet repose sur une orchestration de 4 services isolés :
+
+- **🧠 MLflow Server** : Gestion du registre de modèles et des expérimentations.
+- **📦 MinIO (S3)** : Stockage des artifacts (fichiers .pkl) pour un découplage total.
+- **🚀 FastAPI** : Serveur de prédiction haute performance qui interroge dynamiquement le registre.
+- **🎨 Streamlit** : Interface utilisateur réactive affichant la version du modèle en temps réel.
+
+
+## Environment Variables
+
+Variable,Valeur par défaut,Description
+
+AWS_ACCESS_KEY_ID=minioadmin,Login de l'interface MinIO
+AWS_SECRET_ACCESS_KEY=minioadmin. Password de l'interface MinIO
+MLFLOW_S3_ENDPOINT_URL=http://localhost:9000. Point d'entrée pour le stockage des modèles
+MLFLOW_TRACKING_URI=http://localhost:5000. Connexion au registre de modèles
+
+
+## Installation
+
+# 1. Cloner le projet
+git clone [URL_DU_DEPOT]
+cd iris-ml-factory
+
+# 2. Configurer les variables d'environnement
 cp .env.example .env
-Éditez le .env avec les accès suivants :
 
-AWS_ACCESS_KEY_ID=minioadmin
-
-AWS_SECRET_ACCESS_KEY=minioadmin
-
-MLFLOW_S3_ENDPOINT_URL=http://localhost:9000 (pour l'hôte)
-
-MLFLOW_TRACKING_URI=http://localhost:5000
-
-2. Démarrage des services Docker
-Bash
+# 3. Lancer l'infrastructure (Docker)
 docker compose up -d --build
-Accès : MLflow (:5000), MinIO (:9001), Streamlit (:8501), API (:8000).
+    
+## Usage/Examples
 
-3. Cycle d'entraînement (Hot-Reloading)
-Phase 1 (V1) : Lancez uv run --env-file .env src/train/train.py. Cela crée le modèle et l'alias prod.
+### Phase 1 : Entraînement Initial
+Lancez l'entraînement de la V1 (Logistic Regression) :
+```bash
+uv run --env-file .env src/train/train.py
+```
+### Phase 2 : Mise à jour dynamique (Hot-Reloading)
+Lancez l'entraînement de la V2 (Random Forest) :
 
-Test UI : Faites une prédiction sur Streamlit. Elle affiche v1.
+uv run --env-file .env src/train/train2.py
 
-Phase 2 (V2) : Lancez uv run --env-file .env src/train/train2.py.
 
-Bascule : Une fois l'alias prod déplacé sur la V2 (via script ou UI MLflow), Streamlit affiche v2 instantanément sans redémarrer l'API.
+L'API détecte le changement d'alias. Rafraîchissez l'interface Streamlit pour voir la V2 en action sans redémarrage.
 
-🛡️ Débogage & Robustesse
-Logs : docker compose logs -f api front pour suivre les échanges en temps réel.
+### A. Tech Stack
+*(Dans cette tuile, sélectionne les logos ou liste-les simplement comme ceci)* :
+- **Backend :** Python 3.10+, FastAPI, Uvicorn.
+- **Frontend :** Streamlit.
+- **MLOps :** MLflow, MinIO (S3-compliant).
+- **DevOps :** Docker, Docker-Compose.
+- **Gestionnaire de paquets :** UV.
 
-Gestion d'erreur : Le Front Streamlit intercepte les dictionnaires {'error': '...'} si l'alias prod est manquant dans le registre, évitant ainsi un crash de l'interface.
+---
+
+### B. Lessons Learned 
+**Contenu :**
+```markdown
+Ce projet a permis de valider des concepts critiques d'ingénierie ML :
+- **Le découplage** : Séparer le code de l'API des fichiers de modèles pour faciliter la scalabilité.
+- **L'abstraction** : Utiliser des alias (`@prod`) plutôt que des IDs de version fixes pour permettre des rollbacks instantanés.
+- **La robustesse** : Gérer les erreurs de connexion entre services dans un réseau Docker.
+
+------------------------------------------------------------------
+### Tech Stack
+
+**Cœur du Système :**
+* **Langage :** Python 3.10+ (Gestion via **uv**)
+* **API :** FastAPI & Uvicorn (Asynchrone & Haute performance)
+* **Interface :** Streamlit (UI réactive)
+
+**Infrastructure & MLOps :**
+* **Conteneurisation :** Docker & Docker Compose
+* **Registre de modèles :** MLflow
+* **Stockage S3 :** MinIO
+* **Base de données :** SQLite (Persistance des métadonnées)
+
+**Science des données :**
+* **ML Library :** Scikit-Learn (Logistic Regression & Random Forest)
+* **Data :** Pandas & NumPy
+--------------------------------------------------------------------
+## Support
+
+### 👤 Auteur
+**[Sebastien IamMerove]**
+
