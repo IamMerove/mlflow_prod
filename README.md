@@ -1,62 +1,54 @@
-# 🌸 ML Factory - Iris Prediction Service
+ML Factory - Iris Prediction Service
+Cette "Usine ML" automatise le cycle de vie d'un modèle de Machine Learning, de l'entraînement au serving, avec une gestion de mise à jour à chaud (Hot-Reloading) sans interruption de service.
 
-Cette "Usine ML" automatise le cycle de vie d'un modèle de Machine Learning, de l'entraînement au serving, avec une gestion de mise à jour à chaud (**Hot-Reloading**) sans interruption de service.
+🚀 Fonctionnalités
+Infrastructure MLOps : Orchestration Docker-Compose (MLflow, MinIO, FastAPI, Streamlit).
 
-## 🚀 Fonctionnalités
-- **Infrastructure MLOps** : Orchestration Docker-Compose (MLflow, MinIO, FastAPI, Streamlit).
-- **Expérimentation** : Versionnage automatique des modèles (V1: LogReg, V2: RandomForest).
-- **Zéro-Downtime** : L'API détecte dynamiquement le changement d'alias "Production" dans le registre MLflow.
-- **Interface UI** : Test des prédictions en temps réel avec affichage de la version du modèle.
+Zéro-Downtime : L'API détecte dynamiquement le changement d'alias @prod dans MLflow.
 
-## 📂 Structure du projet
-```text
+Traçabilité : Chaque prédiction affiche la version exacte du modèle utilisé.
+
+📂 Structure du projet
+Plaintext
 .
 ├── src/
 │   ├── api/     # Service FastAPI (Serving)
 │   ├── front/   # Interface Streamlit
-│   └── train/   # Script d'entraînement et de packaging
+│   └── train/   # Scripts d'entraînement (V1 & V2)
 ├── docker-compose.yml
-├── .env.example
+├── .env.example   # Modèle de configuration
 └── README.md
 🛠️ Installation et Lancement
-1. Prérequis
-Docker & Docker Compose
-
-Python 3.10+ (ou uv)
-
-2. Configuration
-Copiez le fichier d'exemple et remplissez vos variables :
+1. Configuration des variables d'environnement
+C'est l'étape cruciale pour la liaison entre les services.
 
 Bash
 cp .env.example .env
-3. Lancement de l'infrastructure
+Éditez le .env avec les accès suivants :
+
+AWS_ACCESS_KEY_ID=minioadmin
+
+AWS_SECRET_ACCESS_KEY=minioadmin
+
+MLFLOW_S3_ENDPOINT_URL=http://localhost:9000 (pour l'hôte)
+
+MLFLOW_TRACKING_URI=http://localhost:5000
+
+2. Démarrage des services Docker
 Bash
-docker compose up -d
-Accès aux outils :
+docker compose up -d --build
+Accès : MLflow (:5000), MinIO (:9001), Streamlit (:8501), API (:8000).
 
-MLflow UI : http://localhost:5000
+3. Cycle d'entraînement (Hot-Reloading)
+Phase 1 (V1) : Lancez uv run --env-file .env src/train/train.py. Cela crée le modèle et l'alias prod.
 
-MinIO UI : http://localhost:9001
+Test UI : Faites une prédiction sur Streamlit. Elle affiche v1.
 
-4. Entraînement et Déploiement
-Pour entraîner le modèle et le pousser en production :
+Phase 2 (V2) : Lancez uv run --env-file .env src/train/train2.py.
 
-Bash
-uv run --env-file .env src/train/train.py
-uv run --env-file .env src/train/train2.py
+Bascule : Une fois l'alias prod déplacé sur la V2 (via script ou UI MLflow), Streamlit affiche v2 instantanément sans redémarrer l'API.
 
-5. Lancement de l'interface utilisateur
-Bash
-uv run streamlit run src/front/app.py
+🛡️ Débogage & Robustesse
+Logs : docker compose logs -f api front pour suivre les échanges en temps réel.
 
-📊 Démonstration du Hot-Reloading
-Effectuez une prédiction sur le Front (Version 1 affichée).
-
-Modifiez le modèle dans train.py (ex: passage à RandomForest).
-
-Relancez le script d'entraînement.
-
-Refaites une prédiction sur le Front : la Version 2 apparaît instantanément sans redémarrage des services.
-
-🛡️ Traçabilité
-Chaque réponse de l'API contient le champ model_version pour assurer une correspondance totale entre la prédiction et l'expérience enregistrée dans MLflow.
+Gestion d'erreur : Le Front Streamlit intercepte les dictionnaires {'error': '...'} si l'alias prod est manquant dans le registre, évitant ainsi un crash de l'interface.
