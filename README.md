@@ -28,10 +28,10 @@ Le projet repose sur une orchestration de 4 services isolés :
 
 Variable,Valeur par défaut,Description
 
-AWS_ACCESS_KEY_ID=minioadmin,Login de l'interface MinIO
-AWS_SECRET_ACCESS_KEY=minioadmin. Password de l'interface MinIO
-MLFLOW_S3_ENDPOINT_URL=http://localhost:9000. Point d'entrée pour le stockage des modèles
-MLFLOW_TRACKING_URI=http://localhost:5000. Connexion au registre de modèles
+AWS_ACCESS_KEY_ID=minioadmin (Login de l'interface MinIO)
+AWS_SECRET_ACCESS_KEY=minioadmin (Password de l'interface MinIO)
+MLFLOW_S3_ENDPOINT_URL=http://localhost:9000 (Point d'entrée pour le stockage des modèles)
+MLFLOW_TRACKING_URI=http://localhost:5000 (Connexion au registre de modèles)
 
 
 ## Installation
