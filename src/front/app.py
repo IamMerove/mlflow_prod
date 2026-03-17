@@ -27,20 +27,22 @@ if st.button("Prédire"):
     
     try:
         # On appelle ton API FastAPI
-        response = requests.post("http://localhost:8000/predict", json=payload)
+        response = requests.post("http://api:8000/predict", json=payload)
         result = response.json()
-        
-        # Affichage du résultat avec mise en valeur de la VERSION
-        st.divider()
-        st.balloons()
-        
-        c1, c2 = st.columns(2)
-        c1.metric(label="Classe Prédite", value=result["prediction"][0])
-        
-        c2.metric(label="Version du Modèle", value=f"v{result['model_version']}")
-        
-        st.success(f"Prédiction effectuée avec succès par l'usine.")
-        
+
+        if "error" in result:
+            st.error(f"Erreur API : {result['error']}")
+        else:
+            # Affichage du résultat avec mise en valeur de la VERSION
+            st.divider()
+            st.balloons()
+
+            c1, c2 = st.columns(2)
+            c1.metric(label="Classe Prédite", value=result["prediction"][0])
+            c2.metric(label="Version du Modèle", value=f"v{result['model_version']}")
+
+            st.success(f"Prédiction effectuée avec succès malheuresement vous n'avez pas eu tous les bon numéros.")
+
     except Exception as e:
         st.error(f"Erreur de connexion à l'API : {e}")
 

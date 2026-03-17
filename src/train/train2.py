@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 mlflow.set_tracking_uri("http://localhost:5000")
-mlflow.set_experiment("Iris_Experiment")
+mlflow.set_experiment("Iris_ExperimentV2")
 
 os.environ['MLFLOW_S3_ENDPOINT_URL'] = "http://localhost:9000"
 

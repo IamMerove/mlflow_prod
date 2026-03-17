@@ -1,7 +1,6 @@
 version: '3.8'
 
 services: 
-  # Stockage
   minio:
     image: minio/minio
     container_name: minio_server
@@ -16,6 +15,7 @@ services:
     command: server /data --console-address ":9001"
     networks:
       - ml_factory_network
+    restart: unless-stopped
 
   api:
     build:
@@ -32,11 +32,23 @@ services:
       - MLFLOW_S3_ENDPOINT_URL=http://minio:9000
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      
     networks:
       - ml_factory_network
+    restart: unless-stopped
 
-  # Le registre des modèles
+  front:
+    build:
+      context: .
+      dockerfile: src/front/Dockerfile
+    container_name: factory_front
+    ports:
+      - "8501:8501"
+    depends_on:
+      - api
+    networks:
+      - ml_factory_network
+    restart: unless-stopped
+
   mlflow:
     image: ghcr.io/mlflow/mlflow
     container_name: mlflow_server
@@ -46,7 +58,7 @@ services:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - MLFLOW_S3_ENDPOINT_URL=http://minio:9000
-      - MLFLOW_SERVER_ALLOWED_HOSTS=localhost,localhost:5000,127.0.0.1,127.0.0.1:5000,,host.docker.internal,host.docker.internal:5000,mlflow,mlflow:5000,0.0.0.0,0.0.0.0:5000,::1,::1:5000
+      - MLFLOW_SERVER_ALLOWED_HOSTS=localhost,localhost:5000,127.0.0.1,127.0.0.1:5000,host.docker.internal,host.docker.internal:5000,mlflow,mlflow:5000,0.0.0.0,0.0.0.0:5000,::1,::1:5000
     networks:
       - ml_factory_network
     command: >
@@ -55,6 +67,7 @@ services:
       --port 5000
       --default-artifact-root s3://mlflow/
       --backend-store-uri sqlite:///mlflow.db
+    restart: unless-stopped
 
 networks:
   ml_factory_network:

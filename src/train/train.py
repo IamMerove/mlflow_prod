@@ -14,7 +14,7 @@ load_dotenv()
 # Comme on lance le script depuis l'hote on utilise localhost
 
 mlflow.set_tracking_uri("http://localhost:5000")
-mlflow.set_experiment("Iris_Experiment")
+mlflow.set_experiment("Iris_Experimentv2")
 # FORCE l'adresse que MLflow va donner aux autres services
 os.environ['MLFLOW_S3_ENDPOINT_URL'] = "http://localhost:9000" 
 # Note : Pour l'API, on devra s'assurer qu'elle utilise 'http://minio:9000'
@@ -51,10 +51,19 @@ def train_and_register():
         # On récupere la derniere version qu'on vient de créer
         client = MlflowClient()
         versions = client.get_latest_versions(model_name, stages=["None"])
-        latest_version = versions[0].version
-        # On pousse l'alias "Production" sur cette version
-        client.set_registered_model_alias(model_name, "Production", latest_version)
-        print(f"✅ Version {latest_version} du modèle '{model_name}' passée en Production.")
+        if not versions:
+            raise RuntimeError(f"Aucune version trouvée pour le modèle '{model_name}'.")
+        latest_version = sorted(versions, key=lambda v: int(v.version))[-1].version
+
+        # Promotion en Production et alias prod
+        client.transition_model_version_stage(
+            name=model_name,
+            version=latest_version,
+            stage="Production",
+            archive_existing_versions=True
+        )
+        client.set_registered_model_alias(model_name, "prod", latest_version)
+        print(f"✅ Version {latest_version} du modèle '{model_name}' passée en Production et alias 'prod' assigné.")
 
 
 if __name__ == "__main__":

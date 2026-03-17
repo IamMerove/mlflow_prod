@@ -43,6 +43,7 @@ Pour entraîner le modèle et le pousser en production :
 
 Bash
 uv run --env-file .env src/train/train.py
+uv run --env-file .env src/train/train2.py
 
 5. Lancement de l'interface utilisateur
 Bash
